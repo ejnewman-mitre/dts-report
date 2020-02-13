@@ -1,25 +1,19 @@
-// Nodejs encryption with CTR
-const crypto = require('crypto');
-const algorithm = 'aes-256-cbc';
-const key = crypto.randomBytes(32);
-const iv = crypto.randomBytes(16);
-
-function encrypt(text) {
- let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
- let encrypted = cipher.update(text);
- encrypted = Buffer.concat([encrypted, cipher.final()]);
- return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };
+const nodemailer = require('nodemailer')
+function main() {
+   console.log('email function running!')
+   let transporter = nodemailer.createTransport({
+     port: 25,
+     host: 'mail.mitre.org',
+     secure: false,
+     ignoreTLS: true
+   })
+   let info = transporter.sendMail({
+       from: '"Eric" <ejnewman@mitre.org>',
+       to: "ejnewman@mitre.org",
+       subject: "Eric Test!",
+       text: "Hello world?", // plain text body
+       html: "<b>Hello world?</b>" // html body
+   })
+   console.log("Message sent: %s", info.messageId)
 }
-
-function decrypt(text) {
- let iv = Buffer.from(text.iv, 'hex');
- let encryptedText = Buffer.from(text.encryptedData, 'hex');
- let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
- let decrypted = decipher.update(encryptedText);
- decrypted = Buffer.concat([decrypted, decipher.final()]);
- return decrypted.toString();
-}
-
-var hw = encrypt("Some serious stuff")
-console.log(hw)
-console.log(decrypt(hw))
+main()

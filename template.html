@@ -1,28 +1,92 @@
-Hi {{fname}},
+<style type="text/css">
+table, th, td {
+	border-collapse: collapse;
+	border:1px solid #eef;
+	background: #333;
+}
+.cent {
+	text-align: center;
+}
+table.padded-table {
+	border: 1px solid #ccf;
+}
+table.padded-table td { padding:10px; }
+th { background:#5F8CE0; color:white; }
+th.tots { background:#ACE; color:white; }
 
+.reportTable {
+	width:400px;
+}
+.noncomp {
+	background: #800;
+	color:white;
+}
+</style>
+<p>Hi {{fname}},</p>
+<p>
 This is just a friendly reminder that the current DTS Compliance Report shows that you
-have one or more devices that are overdue for upgrades or patches.
+have one or more devices that are overdue for upgrades or that need patches.
+</p>
+<p>
+Here's where the T881 group stands at the moment:
+</p>
 
+<table class="reportTable">
+	<tbody>
+		<tr>
+				<th colspan="4" scope="column">
+					T881 Agile Sys Design &amp; Engineering Summary Report
+				</th>
+		</tr>
+		<tr>
+			<td>Compliant Machines</td>
+			<td class="cent">{{compliantCount}}</td>
+		</tr>
+		<tr>
+			<td>Non-Compliant Machines</td>
+			<td class="noncomp cent">{{nonCompliantCount}}</td>
+		</tr>
+		<tr>
+			<td>Machines Not Reporting</td>
+			<td class="cent">{{notReportingCount}}</td>
+		</tr><tr>
+		</tr><tr>
+			<td class="tots">Total Machines</td>
+			<td class="cent">{{totalMachines}}</td>
+		</tr>
+	</tbody>
+</table>
+<p>
 Please install the recommended patches and run the "Inventory Now" function inside of
 the Mitre Self-Service app to update your compliance status.
-
-
+</p>
+<p>
 The following devices need attention:
-
-
+<br/>
+<br/>
+<br/>
+<table  class="padded-table">
+<tr><th>DEVICE</th><th>ID</th><th>PROBLEM REPORTED</th></th>
 {{#each machine}}
-• {{this}}
+<tr><td>{{{this}}}</td></tr>
 {{/each}}
-
+</table>
+</p>
+You can get more information about these issues, and links to update at FJ: <a href="http://dts.mitre.org/dts/orgReport.aspx?txtDept=T881">DTS</a>
+</p>
 Thank you!
-
+<p>
 Please Update your overdue patches to bring your equipment back into security compliance.
-
-We don’t want to show up as non-compliant on these Monday reports that go to senior
-leaders for advanced attention.
-
-FJ: DTS http://dts.mitre.org/dts/orgReport.aspx?txtDept=T881
-==========================================================================================
-== This is an automated email reminder, so please let me know if something doesn't look ==
-== correct. (original sent to Cindy && {{email}}         ==
-==========================================================================================
+<p/>
+<p/>
+<i>We don’t want to show up as non-compliant on these Monday reports that go to senior
+leaders for advanced attention.</i>
+<p/>
+<p/>
+FJ: DTS <a href="http://dts.mitre.org/dts/orgReport.aspx?txtDept=T881">http://dts.mitre.org/dts/orgReport.aspx?txtDept=T881</a>
+</p>
+<p>
+<table border=1 class="padded-table">
+<tr><td>This is an automated email reminder, so please let {{{author}}} know if something doesn't look<br/>
+correct. (original sent to Cindy && {{email}}</td></tr></table>
+</p>

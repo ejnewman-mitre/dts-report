@@ -4,30 +4,28 @@ const fs = require('fs');
 const cheerio = require("cheerio");
 const handlebars = require('handlebars');
 const parse = require("csv-parse");
-const decode = require("./encryption");
-const nodeoutlook = require('nodejs-nodemailer-outlook')
+//const nodeoutlook = require('nodejs-nodemailer-outlook')
+const nodemailer = require('nodemailer')
 
-
-const fname = "DTS.html";
+const fname = "Desktop Steward Compliance Report.html";
 
 const data = fs.readFileSync(fname, 'utf8');
+const emailpw = fs.readFileSync('.credentials', 'utf8');
+
 const $ = cheerio.load(data);
+const mode = process.argv[2] || '';
 
 const people = fs.readFileSync('contacts.csv', 'utf8');
-let  found = user = machine = status = problem = "";
+let  found = user = machine = status = problem = "", badcount=0;
 
-let compliantCount = $("#ContentPlaceHolder1_lblCompliantCnt").text();
+let compliantCount    = $("#ContentPlaceHolder1_lblCompliantCnt").text();
 let nonCompliantCount = $("#ContentPlaceHolder1_lblNCCnt").text();
 let notReportingCount = $("#ContentPlaceHolder1_lblWaivedCnt").text();
+let totalMachines     = $("#ContentPlaceHolder1_lblTotal").text();
 
-//const source = " Dear {{user}},\n\n   This is a friendly DTS reminer. \r\n Your machine with an ID of {{machine}} is out of spec.\n\n {{status}}\n\n\n\n";
 const source = fs.readFileSync('template.html', 'utf8');
 const template = handlebars.compile(source);
-const emailpw = {
-  iv: 'd5d4aca00f492fe9a39deb418fa88461',
-  encryptedData: '707d24f90d615a064a3c28ee73d3ff8f32075b8f74830cd756faeeeb62af1653'
-}
-
+let emailBusy = false;
 
 	parse(people, {
 	  columns: ['dts_name', 'email', 'fname'],
@@ -35,7 +33,7 @@ const emailpw = {
 	}, function(err, records){
 	if(!err) {
 
-		process(records);
+		eprocess(records);
 
 	}
 	});
@@ -44,16 +42,16 @@ const emailpw = {
 return;
 
 
- function process(records) {
+ function eprocess(records) {
  	let prevUser = '', machine = [], status = "",mechname = "";
 
 	$("#ContentPlaceHolder1_ctl09_tblDeptDetail tbody > tr").each((index, element) => {
+
 
 			user =         $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(1)").find('a').first().text() || user;
 			let mach =     $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(2)").find('a').first().text() || [];
 			machname = $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(3) > div").text() || "";
 			problem =      $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(4)").find('img').attr('src') || "";
-			//
 
 
 			if(user !== prevUser) {
@@ -62,7 +60,8 @@ return;
 
 			switch(problem) {
 				case 'images/redx.png':
-					status = ('Seems to be missing some critical updates.')
+					status = 'Seems to be missing some critical patches or system updates.'
+					machine.push(machname.trim() + "</td><td>" + mach.trim() + "</td><td>" + status.trim());
 					break;
 
 				case 'images/question.jpg':
@@ -88,9 +87,7 @@ return;
 			prevUser = user;
 
 			user = user.replace(',', ' ');
-			if(user && status) {
-
-				machine.push(machname.trim() + "\r\n   ID:(" + mach.trim() + ") : " + status.trim());
+			if(user && (machine.length > 0)) {
 
 				found = records.find( d => d.dts_name === user )
 				if(!found) {
@@ -103,30 +100,71 @@ return;
 					  machine: machine,
 					  status: status,
 					  fname: found.fname,
-					  email: found.email.padEnd(40, ' ')
+					  author: '<a href="mailto:ejnewman@mitre.org?subject=DTS Report">Eric Newman</a>',
+					  email: found.email.padEnd(40, ' '),
+					  compliantCount: compliantCount,
+					  nonCompliantCount: nonCompliantCount,
+					  notReportingCount: notReportingCount,
+					  totalMachines: totalMachines
 					}
 					let html = template(data);
-					console.log(html)
-					sendEmail()
+						sendEmail(html, found.fname, found.email)
 					}
 			}
-
 	});
 }
 
- function  sendEmail() {
- 	console.log(decode(emailpw
- 	))
-// 		nodeoutlook.sendEmail({
-// 			auth: {
-// 				user: "ericnewman@mitre.org",
-// 				pass: """
-// 			},
-// 			from: 'sender@outlook.com',
-// 			to: 'receiver@gmail.com',
-// 			subject: 'Hey you, awesome!',
-// 			html: '<b>This is bold text</b>',
-// 			text: 'This is text version!',
-// 			replyTo: 'receiverXXX@gmail.com',
-// 		}
-}
+
+function  sendEmail(html, uname, address) {
+
+			if(mode !== 'test') {
+
+				console.log('Send to ' + address);
+
+
+			   let transporter = nodemailer.createTransport({
+				 port: 25,
+				 host: 'mail.mitre.org',
+				 secure: false,
+				 ignoreTLS: true
+			   })
+			   let info = transporter.sendMail({
+					from: 'ejnewman@mitre.org',
+					to: 'ejnewman@mitre.org',
+					subject: uname + '\'s DTS Reminder',
+					html: html,
+					text: html.replace(/(<([^>]+)>)/ig,""),
+					eplyTo: 'ejnewman@mitre.org',
+					onError: (e) => {
+						console.log(e)
+					},
+					onSuccess: (i) => {
+						console.log('Success: '+ address)
+					}
+
+			   })
+   				console.log("Message sent: %s", info.messageId)
+
+
+// 				nodeoutlook.sendEmail({
+// 					auth: {
+// 						user: "ejnewman@mitre.org",
+// 						pass: emailpw
+// 					},
+// 					from: 'ejnewman@mitre.org',
+// 					to: 'ejnewman@mitre.org',
+// 					subject: uname + '\'s DTS Reminder',
+// 					html: html,
+// 					text: html.replace(/(<([^>]+)>)/ig,""),
+// 					replyTo: 'ejnewman@mitre.org',
+// 					onError: (e) => {
+// 						console.log(e)
+// 					},
+// 					onSuccess: (i) => {
+// 						console.log('Success: '+ address)
+// 					}
+// 				})
+			} else {
+				console.log('skipping send to ' + address);
+			}
+	}
