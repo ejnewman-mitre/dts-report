@@ -4,13 +4,11 @@ const fs = require('fs');
 const cheerio = require("cheerio");
 const handlebars = require('handlebars');
 const parse = require("csv-parse");
-//const nodeoutlook = require('nodejs-nodemailer-outlook')
 const nodemailer = require('nodemailer')
 
 const fname = "Desktop Steward Compliance Report.html";
 
 const data = fs.readFileSync(fname, 'utf8');
-const emailpw = fs.readFileSync('.credentials', 'utf8');
 
 const $ = cheerio.load(data);
 const mode = process.argv[2] || '';
@@ -143,27 +141,10 @@ function  sendEmail(html, uname, address) {
 					}
 
 			   })
-   				console.log("Message sent: %s", info.messageId)
+				if(mode == 'just1') {
+					process.exit();
+				}
 
-
-// 				nodeoutlook.sendEmail({
-// 					auth: {
-// 						user: "ejnewman@mitre.org",
-// 						pass: emailpw
-// 					},
-// 					from: 'ejnewman@mitre.org',
-// 					to: 'ejnewman@mitre.org',
-// 					subject: uname + '\'s DTS Reminder',
-// 					html: html,
-// 					text: html.replace(/(<([^>]+)>)/ig,""),
-// 					replyTo: 'ejnewman@mitre.org',
-// 					onError: (e) => {
-// 						console.log(e)
-// 					},
-// 					onSuccess: (i) => {
-// 						console.log('Success: '+ address)
-// 					}
-// 				})
 			} else {
 				console.log('skipping send to ' + address);
 			}
