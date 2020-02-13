@@ -1,12 +1,25 @@
-const parse = require('csv-parse/lib/sync')
-const assert = require('assert')
+// Nodejs encryption with CTR
+const crypto = require('crypto');
+const algorithm = 'aes-256-cbc';
+const key = crypto.randomBytes(32);
+const iv = crypto.randomBytes(16);
 
-const input = `
-"key_1","key_2"
-"value 1","value 2"
-`
-const records = parse(input, {
-  columns: true,
-  skip_empty_lines: true
-})
-assert.deepEqual(records, [{ key_1: 'value 1', key_2: 'value 2' }])
+function encrypt(text) {
+ let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
+ let encrypted = cipher.update(text);
+ encrypted = Buffer.concat([encrypted, cipher.final()]);
+ return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };
+}
+
+function decrypt(text) {
+ let iv = Buffer.from(text.iv, 'hex');
+ let encryptedText = Buffer.from(text.encryptedData, 'hex');
+ let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
+ let decrypted = decipher.update(encryptedText);
+ decrypted = Buffer.concat([decrypted, decipher.final()]);
+ return decrypted.toString();
+}
+
+var hw = encrypt("Some serious stuff")
+console.log(hw)
+console.log(decrypt(hw))
