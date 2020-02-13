@@ -1,16 +1,14 @@
-<p>Hi {{fname}},</p>
+<p>Hi Cindy,</p>
 <p>
-This is just a friendly reminder that the current DTS Compliance Report shows that you
-have one or more devices that are overdue for upgrades or that need patches.
+This is summary of the outstanding machine updates from the T881 DTS report.
 </p>
 <p>
 Here's where the T881 group stands at the moment:
 </p>
-
 <table class="reportTable">
 	<tbody>
 		<tr>
-			<th colspan="4" scope="column">
+			<th colspan="2">
 				T881 Agile Sys Design &amp; Engineering Summary Report
 			</th>
 		</tr>
@@ -33,17 +31,15 @@ Here's where the T881 group stands at the moment:
 	</tbody>
 </table>
 <p>
-Please install the recommended patches and run the "Inventory Now" function inside of
-the Mitre Self-Service app to update your compliance status.
 </p>
 <p>
-The following devices need attention:
+<b>The following users and devices need system updates or other critical attention:</b>
 <br/>
 <br/>
 <br/>
 <table  class="padded-table">
-<tr><th>Device</th><th>ID</th><th>Problem Reported</th></th>
-{{#each machine}}
+<tr><th>User</th><th>Device</th><th>ID</th></tr>
+{{#each bads}}
 <tr><td>{{{this}}}</td></tr>
 {{/each}}
 </table>
@@ -52,17 +48,11 @@ You can get more information about these issues, and links for updates at FJ: <a
 </p>
 Thank you!
 <p>
-Please perform any needed updates and overdue patches to bring your equipment back into security compliance.
-<p/>
-<p/>
-<i>We don’t want to show up as non-compliant on these Monday reports that go to senior
-leaders for advanced attention.</i>
-<p/>
 <p/>
 FJ: DTS <a href="http://dts.mitre.org/dts/orgReport.aspx?txtDept=T881">http://dts.mitre.org/dts/orgReport.aspx?txtDept=T881</a>
 </p>
 <p>
 <table border=1 class="padded-table">
 <tr><td>This is an automated email reminder, so please let {{{author}}} know if something doesn't look<br/>
-correct. (original sent to Cindy && {{email}}</td></tr></table>
+correct.</td></tr></table>
 </p>

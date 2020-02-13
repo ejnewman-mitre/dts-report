@@ -11,7 +11,7 @@ const fname = "Desktop Steward Compliance Report.html";
 const data = fs.readFileSync(fname, 'utf8');
 
 const $ = cheerio.load(data);
-const mode = process.argv[2] || '';
+let mode = process.argv[2] || '';
 
 const people = fs.readFileSync('contacts.csv', 'utf8');
 let  found = user = machine = status = problem = "", badcount=0;
@@ -21,9 +21,14 @@ let nonCompliantCount = $("#ContentPlaceHolder1_lblNCCnt").text();
 let notReportingCount = $("#ContentPlaceHolder1_lblWaivedCnt").text();
 let totalMachines     = $("#ContentPlaceHolder1_lblTotal").text();
 
-const source = fs.readFileSync('template.html', 'utf8');
+const styles = fs.readFileSync('styles.css', 'utf8');
+
+const source = styles + fs.readFileSync('template.html', 'utf8');
 const template = handlebars.compile(source);
-let emailBusy = false;
+const csource = styles + fs.readFileSync('ctemplate.html', 'utf8');
+const ctemplate = handlebars.compile(csource);
+
+let bads = [];
 
 	parse(people, {
 	  columns: ['dts_name', 'email', 'fname'],
@@ -32,12 +37,30 @@ let emailBusy = false;
 	if(!err) {
 
 		eprocess(records);
+		cprocess(bads);
+
 
 	}
 	});
 
 
 return;
+ function cprocess(records) {
+	let data = {
+	  author: '<a href="mailto:ejnewman@mitre.org?subject=DTS Report">Eric Newman</a>',
+	  bads: bads,
+	  compliantCount: compliantCount,
+	  nonCompliantCount: nonCompliantCount,
+	  notReportingCount: notReportingCount,
+	  totalMachines: totalMachines
+	}
+	let html = ctemplate(data);
+	console.log(html);
+	mode = 'cindy'
+	sendEmail(html, 'Cindy', 'Eric', 'Cindy\'s DTS Updates Report Summary')
+
+
+ }
 
 
  function eprocess(records) {
@@ -58,8 +81,9 @@ return;
 
 			switch(problem) {
 				case 'images/redx.png':
-					status = 'Seems to be missing some critical patches or system updates.'
+					status = 'Missing some critical patches or system updates.'
 					machine.push(machname.trim() + "</td><td>" + mach.trim() + "</td><td>" + status.trim());
+					bads.push(user.trim() + "</td><td>" + machname.trim() + "</td><td>" + mach.trim());
 					break;
 
 				case 'images/question.jpg':
@@ -106,14 +130,14 @@ return;
 					  totalMachines: totalMachines
 					}
 					let html = template(data);
-						sendEmail(html, found.fname, found.email)
+						sendEmail(html, found.fname, found.email, found.fname + '\'s DTS updates reminder',)
 					}
 			}
 	});
 }
 
 
-function  sendEmail(html, uname, address) {
+function  sendEmail(html, uname, address, title) {
 
 			if(mode !== 'test') {
 
@@ -129,7 +153,7 @@ function  sendEmail(html, uname, address) {
 			   let info = transporter.sendMail({
 					from: 'ejnewman@mitre.org',
 					to: 'ejnewman@mitre.org',
-					subject: uname + '\'s DTS Reminder',
+					subject: title,
 					html: html,
 					text: html.replace(/(<([^>]+)>)/ig,""),
 					eplyTo: 'ejnewman@mitre.org',
@@ -142,7 +166,7 @@ function  sendEmail(html, uname, address) {
 
 			   })
 				if(mode == 'just1') {
-					process.exit();
+					mode = 'test';
 				}
 
 			} else {
