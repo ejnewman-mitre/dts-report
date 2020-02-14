@@ -28,39 +28,61 @@ const template = handlebars.compile(source);
 const csource = styles + fs.readFileSync('ctemplate.html', 'utf8');
 const ctemplate = handlebars.compile(csource);
 
-let bads = [];
+let bads = [], glbads = [];
 
 	parse(people, {
-	  columns: ['dts_name', 'email', 'fname'],
+	  columns: ['dts_name', 'email', 'fname', 'manager'],
 	  skip_empty_lines: true
 	}, function(err, records){
-	if(!err) {
-
-		eprocess(records);
-		cprocess(bads);
-
-
-	}
+		if(!err) {
+			eprocess(records);
+			//cprocess();
+			//glprocess(records);
+		} else {
+			console.log(err)
+		}
 	});
 
-
-return;
- function cprocess(records) {
+//  function cprocess() {
+// 	let data = {
+// 	  author: '<a href="mailto:ejnewman@mitre.org?subject=DTS Report">Eric Newman</a>',
+// 	  recipient: 'Cindy',
+// 	  bads: bads,
+// 	  compliantCount: compliantCount,
+// 	  nonCompliantCount: nonCompliantCount,
+// 	  notReportingCount: notReportingCount,
+// 	  totalMachines: totalMachines
+// 	}
+// 	let html = ctemplate(data);
+//
+// 	mode = 'cindy'
+// 	sendEmail(html, 'Cindy', 'Eric', 'Cindy\'s DTS Updates Report Summary')
+//  }
+ function glprocess(records) {
 	let data = {
 	  author: '<a href="mailto:ejnewman@mitre.org?subject=DTS Report">Eric Newman</a>',
-	  bads: bads,
+	  recipient: 'TBD',
+	  bads: glbads,
 	  compliantCount: compliantCount,
 	  nonCompliantCount: nonCompliantCount,
 	  notReportingCount: notReportingCount,
 	  totalMachines: totalMachines
 	}
-	let html = ctemplate(data);
-	console.log(html);
-	mode = 'cindy'
-	sendEmail(html, 'Cindy', 'Eric', 'Cindy\'s DTS Updates Report Summary')
 
+	Object.keys(glbads).forEach(function (key) {
+		data.bads = glbads[key];
+		let p = records.find( d => d.email === key )
+		if(p ) {
+			data.recipient = p.fname
+			let html = ctemplate(data);
 
- }
+			mode = 'gl'
+			sendEmail(html, data.recipient, key, 'Group Leads\'s DTS Updates Report Summary')
+		}
+
+	});
+
+}
 
 
  function eprocess(records) {
@@ -70,67 +92,74 @@ return;
 
 
 			user =         $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(1)").find('a').first().text() || user;
-			let mach =     $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(2)").find('a').first().text() || [];
-			machname = $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(3) > div").text() || "";
-			problem =      $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(4)").find('img').attr('src') || "";
 
+			if(user) {
 
-			if(user !== prevUser) {
-				machine = []
-			}
+				let mach =     $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(2)").find('a').first().text() || [];
+				machname = 	   $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(3) > div").text() || "";
+				problem =      $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(4)").find('img').attr('src') || "";
 
-			switch(problem) {
-				case 'images/redx.png':
-					status = 'Missing some critical patches or system updates.'
-					machine.push(machname.trim() + "</td><td>" + mach.trim() + "</td><td>" + status.trim());
-					bads.push(user.trim() + "</td><td>" + machname.trim() + "</td><td>" + mach.trim());
-					break;
+				cuser = user.replace(',', ' ') // Kill the spurious commas
 
-				case 'images/question.jpg':
-					//status = ('Seems it has not reported in for a while.')
-					status = ''
+				found = records.find( d => d.dts_name === cuser )
 
-					break;
-
-				case 'images/warning.png':
-					//status = ('Looks like it has some updates pending.')
-					status = ''
-					break;
-
-				case 'images/greencheck.png':
-					status = ''
-					break;
-				default:
-					status = '';
-					break;
-
-			}
-
-			prevUser = user;
-
-			user = user.replace(',', ' ');
-			if(user && (machine.length > 0)) {
-
-				found = records.find( d => d.dts_name === user )
-				if(!found) {
-					console.log("Missing Name: " + user)
+				if(user !== prevUser) {
+					machine = []
 				}
-				else {
 
-					let data = {
-					  user: found.dts_name + " " + found.email,
-					  machine: machine,
-					  status: status,
-					  fname: found.fname,
-					  author: '<a href="mailto:ejnewman@mitre.org?subject=DTS Report">Eric Newman</a>',
-					  email: found.email.padEnd(40, ' '),
-					  compliantCount: compliantCount,
-					  nonCompliantCount: nonCompliantCount,
-					  notReportingCount: notReportingCount,
-					  totalMachines: totalMachines
+				switch(problem) {
+					case 'images/redx.png':
+						status = 'Missing some critical patches or system updates.'
+						machine.push(machname.trim() + "</td><td>" + mach.trim() + "</td><td>" + status.trim());
+						let baduser = user.trim() + "</td><td>" + machname.trim() + "</td><td>" + mach.trim()
+						bads.push(baduser);
+						if(!glbads[found.manager]) {glbads[found.manager] = []}
+						glbads[found.manager].push(baduser)
+						break;
+
+					case 'images/question.jpg':
+						//status = ('Seems it has not reported in for a while.')
+						status = ''
+						break;
+
+					case 'images/warning.png':
+						//status = ('Looks like it has some updates pending.')
+						status = ''
+						break;
+
+					case 'images/greencheck.png':
+						status = ''
+						break;
+					default:
+						status = '';
+						break;
+
+				}
+
+				prevUser = user;
+
+				if(cuser && (machine.length > 0)) {
+
+					//found = records.find( d => d.dts_name === user )
+					if(!found) {
+						console.log("Missing Name: " + cuser)
 					}
-					let html = template(data);
-						sendEmail(html, found.fname, found.email, found.fname + '\'s DTS updates reminder',)
+					else {
+							let data = {
+							  user: found.dts_name + " " + found.email,
+							  machine: machine,
+							  status: status,
+							  fname: found.fname,
+							  author: '<a href="mailto:ejnewman@mitre.org?subject=DTS Report">Eric Newman</a>',
+							  email: found.email.padEnd(40, ' '),
+							  compliantCount: compliantCount,
+							  nonCompliantCount: nonCompliantCount,
+							  notReportingCount: notReportingCount,
+							  totalMachines: totalMachines
+							}
+							let html = template(data);
+							sendEmail(html, found.fname, found.email, found.fname + '\'s DTS updates reminder',)
+						}
 					}
 			}
 	});
@@ -143,7 +172,6 @@ function  sendEmail(html, uname, address, title) {
 
 				console.log('Send to ' + address);
 
-
 			   let transporter = nodemailer.createTransport({
 				 port: 25,
 				 host: 'mail.mitre.org',
@@ -152,11 +180,11 @@ function  sendEmail(html, uname, address, title) {
 			   })
 			   let info = transporter.sendMail({
 					from: 'ejnewman@mitre.org',
-					to: 'ejnewman@mitre.org',
+					to: 'ejnewman@mitre.org', //address
 					subject: title,
 					html: html,
 					text: html.replace(/(<([^>]+)>)/ig,""),
-					eplyTo: 'ejnewman@mitre.org',
+					replyTo: 'ejnewman@mitre.org',
 					onError: (e) => {
 						console.log(e)
 					},

@@ -22,4 +22,7 @@ td.tots { background:#AAA; color:white; }
 	background: #800;
 	color:white;
 }
+.author a {
+	color: green
+}
 </style>
