@@ -36,28 +36,12 @@ let bads = [], glbads = [];
 	}, function(err, records){
 		if(!err) {
 			eprocess(records);
-			//cprocess();
-			//glprocess(records);
+			glprocess(records);
 		} else {
 			console.log(err)
 		}
 	});
 
-//  function cprocess() {
-// 	let data = {
-// 	  author: '<a href="mailto:ejnewman@mitre.org?subject=DTS Report">Eric Newman</a>',
-// 	  recipient: 'Cindy',
-// 	  bads: bads,
-// 	  compliantCount: compliantCount,
-// 	  nonCompliantCount: nonCompliantCount,
-// 	  notReportingCount: notReportingCount,
-// 	  totalMachines: totalMachines
-// 	}
-// 	let html = ctemplate(data);
-//
-// 	mode = 'cindy'
-// 	sendEmail(html, 'Cindy', 'Eric', 'Cindy\'s DTS Updates Report Summary')
-//  }
  function glprocess(records) {
 	let data = {
 	  author: '<a href="mailto:ejnewman@mitre.org?subject=DTS Report">Eric Newman</a>',
