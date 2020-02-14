@@ -164,7 +164,7 @@ function  sendEmail(html, uname, address, title) {
 			   })
 			   let info = transporter.sendMail({
 					from: 'ejnewman@mitre.org',
-					to: 'ejnewman@mitre.org', //address
+					to: address, //address
 					subject: title,
 					html: html,
 					text: html.replace(/(<([^>]+)>)/ig,""),
