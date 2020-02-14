@@ -9,12 +9,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "applescript": "^1.0.0",
     "axios": "^0.19.2",
     "cheerio": "^1.0.0-rc.3",
     "csv": "^5.3.1",
     "csv-parser": "^2.3.2",
     "handlebars": "^4.7.3",
-    "nodemailer": "^6.4.2"
+    "nodemailer": "^6.4.2",
+    "opn": "^6.0.0",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.5"
   },
   "devDependencies": {},
   "description": ""

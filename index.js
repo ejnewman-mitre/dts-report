@@ -88,6 +88,25 @@ let bads = [], glbads = [];
 				found = records.find( d => d.dts_name === cuser )
 
 				if(user !== prevUser) {
+					if(found && cuser && (machine.length > 0)) {
+						//console.log("all Done " + user, machine, machine.length)
+
+						let data = {
+						  user: found.dts_name + " " + found.email,
+						  machine: machine,
+						  status: status,
+						  fname: found.fname,
+						  author: '<a href="mailto:ejnewman@mitre.org?subject=DTS Report">Eric Newman</a>',
+						  email: found.email.padEnd(40, ' '),
+						  compliantCount: compliantCount,
+						  nonCompliantCount: nonCompliantCount,
+						  notReportingCount: notReportingCount,
+						  totalMachines: totalMachines
+						}
+						let html = template(data);
+						sendEmail(html, found.fname, found.email, found.fname + '\'s DTS updates reminder',)
+					}
+
 					machine = []
 				}
 
@@ -122,29 +141,6 @@ let bads = [], glbads = [];
 
 				prevUser = user;
 
-				if(cuser && (machine.length > 0)) {
-
-					//found = records.find( d => d.dts_name === user )
-					if(!found) {
-						console.log("Missing Name: " + cuser)
-					}
-					else {
-							let data = {
-							  user: found.dts_name + " " + found.email,
-							  machine: machine,
-							  status: status,
-							  fname: found.fname,
-							  author: '<a href="mailto:ejnewman@mitre.org?subject=DTS Report">Eric Newman</a>',
-							  email: found.email.padEnd(40, ' '),
-							  compliantCount: compliantCount,
-							  nonCompliantCount: nonCompliantCount,
-							  notReportingCount: notReportingCount,
-							  totalMachines: totalMachines
-							}
-							let html = template(data);
-							sendEmail(html, found.fname, found.email, found.fname + '\'s DTS updates reminder',)
-						}
-					}
 			}
 	});
 }
@@ -164,7 +160,7 @@ function  sendEmail(html, uname, address, title) {
 			   })
 			   let info = transporter.sendMail({
 					from: 'ejnewman@mitre.org',
-					to: address, //address
+					to: address, //'ejnewman@mitre.org', //address
 					subject: title,
 					html: html,
 					text: html.replace(/(<([^>]+)>)/ig,""),
