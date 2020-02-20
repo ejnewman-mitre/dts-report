@@ -42,6 +42,7 @@ let bads = [], glbads = [];
 		}
 	});
 
+// Send To Group Leads
  function glprocess(records) {
 	let data = {
 	  author: '<a href="mailto:ejnewman@mitre.org?subject=DTS Report">Eric Newman</a>',
@@ -60,7 +61,6 @@ let bads = [], glbads = [];
 			data.recipient = p.fname
 			let html = ctemplate(data);
 
-			mode = 'gl'
 			sendEmail(html, data.recipient, key, 'Group Leads\'s DTS Updates Report Summary')
 		}
 
@@ -68,6 +68,7 @@ let bads = [], glbads = [];
 
 }
 
+// Send To Individuals
 
  function eprocess(records) {
  	let prevUser = '', machine = [], status = "",mechname = "";
@@ -78,6 +79,7 @@ let bads = [], glbads = [];
 			user =         $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(1)").find('a').first().text() || user;
 
 			if(user) {
+// 				console.log('===>', user);
 
 				let mach =     $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(2)").find('a').first().text() || [];
 				machname = 	   $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(3) > div").text() || "";
@@ -148,9 +150,14 @@ let bads = [], glbads = [];
 
 function  sendEmail(html, uname, address, title) {
 
-			if(mode !== 'test') {
+			console.log('Sending ' + title + '(' + uname + ') to ' + address);
 
-				console.log('Send to ' + address);
+			if (mode != 'real') {
+				address = 'ejnewman@mitre.org'
+			}
+
+			if(mode !== 'nosend') {
+
 
 			   let transporter = nodemailer.createTransport({
 				 port: 25,
@@ -173,11 +180,8 @@ function  sendEmail(html, uname, address, title) {
 					}
 
 			   })
-				if(mode == 'just1') {
-					mode = 'test';
-				}
 
-			} else {
-				console.log('skipping send to ' + address);
+// 			} else {
+// 				console.log('skipping send to ' + address);
 			}
 	}
