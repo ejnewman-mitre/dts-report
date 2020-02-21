@@ -23,12 +23,10 @@ let totalMachines     = $("#ContentPlaceHolder1_lblTotal").text();
 
 const styles = fs.readFileSync('styles.css', 'utf8');
 
-const source = styles + fs.readFileSync('template.html', 'utf8');
-const template = handlebars.compile(source);
 const csource = styles + fs.readFileSync('ctemplate.html', 'utf8');
 const ctemplate = handlebars.compile(csource);
 
-let bads = [], glbads = [];
+let bads = [], glbads = [], badz = [];
 
 	parse(people, {
 	  columns: ['dts_name', 'email', 'fname', 'manager'],
@@ -36,6 +34,7 @@ let bads = [], glbads = [];
 	}, function(err, records){
 		if(!err) {
 			eprocess(records);
+			processBads(records);
 			glprocess(records);
 		} else {
 			console.log(err)
@@ -87,37 +86,26 @@ let bads = [], glbads = [];
 
 				cuser = user.replace(',', ' ') // Kill the spurious commas
 
-				found = records.find( d => d.dts_name === cuser )
-
+				found = records.find( d => d.dts_name === cuser ) || 'none'
+				//console.log('u:'+user, 'm:'+mach, 'n:'+machname)
 				if(user !== prevUser) {
-					if(found && cuser && (machine.length > 0)) {
-						//console.log("all Done " + user, machine, machine.length)
-
-						let data = {
-						  user: found.dts_name + " " + found.email,
-						  machine: machine,
-						  status: status,
-						  fname: found.fname,
-						  author: '<a href="mailto:ejnewman@mitre.org?subject=DTS Report">Eric Newman</a>',
-						  email: found.email.padEnd(40, ' '),
-						  compliantCount: compliantCount,
-						  nonCompliantCount: nonCompliantCount,
-						  notReportingCount: notReportingCount,
-						  totalMachines: totalMachines
-						}
-						let html = template(data);
-						sendEmail(html, found.fname, found.email, found.fname + '\'s DTS updates reminder',)
-					}
-
 					machine = []
+
 				}
+				user = user.trim();
+				let email = found.email || 'none';
+
 
 				switch(problem) {
 					case 'images/redx.png':
 						status = 'Missing some critical patches or system updates.'
 						machine.push(machname.trim() + "</td><td>" + mach.trim() + "</td><td>" + status.trim());
-						let baduser = user.trim() + "</td><td>" + machname.trim() + "</td><td>" + mach.trim()
+						let baduser = user + "</td><td>" + machname.trim() + "</td><td>" + mach.trim()
+						if(!badz[email]) {badz[email] = []};
+
 						bads.push(baduser);
+						badz[email].push(baduser);
+
 						if(!glbads[found.manager]) {glbads[found.manager] = []}
 						glbads[found.manager].push(baduser)
 						break;
@@ -146,7 +134,41 @@ let bads = [], glbads = [];
 			}
 	});
 }
+function processBads(records) {
 
+	let data = {
+		  bads: [],
+		  user: '',
+		  author: '<a href="mailto:ejnewman@mitre.org?subject=DTS Report">Eric Newman</a>',
+		  email: found.email.padEnd(40, ' '),
+		  compliantCount: compliantCount,
+		  nonCompliantCount: nonCompliantCount,
+		  notReportingCount: notReportingCount,
+		  totalMachines: totalMachines
+		}
+
+	Object.keys(badz).forEach(function (key) {
+
+			let p = records.find( d => d.email === key )
+			if(p) {
+				let data = {
+				  bads: badz[key],
+				  user: p.dts_name + " " + p.email,
+				  recipient: p.fname,
+				  author: '<a href="mailto:ejnewman@mitre.org?subject=DTS Report">Eric Newman</a>',
+				  email: p.email.padEnd(40, ' '),
+				  compliantCount: compliantCount,
+				  nonCompliantCount: nonCompliantCount,
+				  notReportingCount: notReportingCount,
+				  totalMachines: totalMachines
+				}
+
+				let html = ctemplate(data);
+
+				sendEmail(html, p.fname, p.email, p.fname + '\'s DTS updates reminder',)
+			}
+		});
+}
 
 function  sendEmail(html, uname, address, title) {
 
