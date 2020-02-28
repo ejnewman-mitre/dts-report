@@ -60,7 +60,7 @@ let bads = [], glbads = [], badz = [];
 			data.recipient = p.fname
 			let html = ctemplate(data);
 
-			sendEmail(html, data.recipient, key, 'Group Leads\'s DTS Updates Report Summary')
+			sendEmail(html, data.recipient, key, 'Group Lead DTS Updates Report Summary')
 		}
 
 	});
