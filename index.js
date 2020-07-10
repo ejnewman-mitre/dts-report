@@ -72,28 +72,38 @@ let bads = [], glbads = [], badz = [];
  function eprocess(records) {
  	let prevUser = '', machine = [], status = "",mechname = "";
 
+// 		console.log(records)
+// 		found = records.find( d => d.dts_name === "Wilson John A" )
+// 		console.log('d', found.email)
+// 		return;
+
 	$("#ContentPlaceHolder1_ctl09_tblDeptDetail tbody > tr").each((index, element) => {
 
 
 			user =         $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(1)").find('a').first().text() || user;
 
 			if(user) {
-// 				console.log('===>', user);
+ 				//console.log('===>', user);
 
 				let mach =     $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(2)").find('a').first().text() || [];
 				machname = 	   $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(3) > div").text() || "";
 				problem =      $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(4)").find('img').attr('src') || "";
 
-				cuser = user.replace(',', ' ') // Kill the spurious commas
+				cuser = user.replace(',', '') // Kill the spurious commas
 
 				found = records.find( d => d.dts_name === cuser ) || 'none'
+				//console.log("f:",user, cuser)
+
 				//console.log('u:'+user, 'm:'+mach, 'n:'+machname)
 				if(user !== prevUser) {
 					machine = []
-
 				}
 				user = user.trim();
+				//console.log('found.email:', found)
 				let email = found.email || 'none';
+				if(email === 'none') {
+					console.log(user)
+				}
 
 
 				switch(problem) {
