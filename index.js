@@ -27,6 +27,7 @@ const csource = styles + fs.readFileSync('ctemplate.html', 'utf8');
 const ctemplate = handlebars.compile(csource);
 
 let bads = [], glbads = [], badz = [];
+console.log('-------------------------------------------------------------')
 
 	parse(people, {
 	  columns: ['dts_name', 'email', 'fname', 'manager'],
@@ -72,10 +73,6 @@ let bads = [], glbads = [], badz = [];
  function eprocess(records) {
  	let prevUser = '', machine = [], status = "",mechname = "";
 
-// 		console.log(records)
-// 		found = records.find( d => d.dts_name === "Wilson John A" )
-// 		console.log('d', found.email)
-// 		return;
 
 	$("#ContentPlaceHolder1_ctl09_tblDeptDetail tbody > tr").each((index, element) => {
 
@@ -89,22 +86,25 @@ let bads = [], glbads = [], badz = [];
 				machname = 	   $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(3) > div").text() || "";
 				problem =      $("#ContentPlaceHolder1_ctl09_tblDeptDetail > tbody > tr:nth-child(" + index + ") > th:nth-child(4)").find('img').attr('src') || "";
 
-				cuser = user.replace(',', '') // Kill the spurious commas
+				user = user.replace(/ \,/g, ',').trim();
+
+				cuser = user.replace(/\,/g, '');
+				cuser = cuser.replace(/\./g, '') // Kill the spurious commas and periods, and trailing spaces
+				//console.log('records:', records)
 
 				found = records.find( d => d.dts_name === cuser ) || 'none'
-				//console.log("f:",user, cuser)
 
-				//console.log('u:'+user, 'm:'+mach, 'n:'+machname)
+				//console.log('u:'+user, '|c:', cuser, '|m:'+mach, '|n:'+machname, '|p:', prevUser)
+
 				if(user !== prevUser) {
 					machine = []
 				}
-				user = user.trim();
+
 				//console.log('found.email:', found)
 				let email = found.email || 'none';
 				if(email === 'none') {
-					console.log(user)
+					console.log('No email address for ' + user, found)
 				}
-
 
 				switch(problem) {
 					case 'images/redx.png':
@@ -189,7 +189,6 @@ function  sendEmail(html, uname, address, title) {
 			}
 
 			if(mode !== 'nosend') {
-
 
 			   let transporter = nodemailer.createTransport({
 				 port: 25,
