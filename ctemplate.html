@@ -1,0 +1,72 @@
+<p>Hi {{recipient}},</p>
+<p>
+I'm sending this email because one or more of your devices is in need of a critical system update according to the DTS website.<br />
+</p>
+<br/>
+<b>There's no need to contact me about this, as I'm just relaying the information, </b>but if you need any help you should contact the Help Desk directly.
+<p>
+This is summary of the outstanding machine updates according to the L261 DTS report.
+</p>
+<p>
+Here's where the overall L261 group stands at the moment:
+</p>
+<table class="reportTable">
+	<tbody>
+		<tr>
+			<th colspan="2">
+				L261 Agile Sys Design &amp; Engineering Summary Report
+			</th>
+		</tr>
+		<tr>
+			<td>Compliant Machines</td>
+			<td class="cent">{{compliantCount}}</td>
+		</tr>
+		<tr>
+			<td>Non-Compliant Machines</td>
+			<td class="noncomp cent">{{nonCompliantCount}}</td>
+		</tr>
+		<tr>
+			<td>Machines Not Reporting</td>
+			<td class="cent">{{notReportingCount}}</td>
+		</tr><tr>
+		</tr><tr>
+			<td class="tots">Total Machines</td>
+			<td class="tots cent">{{totalMachines}}</td>
+		</tr>
+	</tbody>
+</table>
+<p>
+</p>
+<p>
+<br/>
+<p>
+These are the systems and owners that are currently non-compliant:
+</p>
+<br/>
+<table  class="padded-table">
+<tr><th width="32%">User</th><th>Device</th><th>ID</th></tr>
+{{#each bads}}
+<tr><td>{{{this}}}</td></tr>
+{{/each}}
+</table>
+</p>
+<p/>
+<p/>
+You can get more information about these issues, and links for updates at FJ: <a href="http://dts.mitre.org/dts/orgReport.aspx?txtDept=L261">DTS</a>
+<p />
+<hr />
+<br/>
+<strong>(...and if you're having trouble with performing the update, or if information about your machine is incorrect, please contact the help desk directly)</strong>
+</p>
+<br/>
+<br/>
+<p>
+Thank you!
+<p/>
+FJ: <a href="http://dts.mitre.org/dts/orgReport.aspx?txtDept=L261">DTS</a>
+</p>
+<p>
+<table border=1 class="padded-table">
+<tr><td>This is an automated email reminder, so please let <span class="author">{{{author}}}</span> know if something doesn't look<br/>
+correct.</td></tr></table>
+</p>
