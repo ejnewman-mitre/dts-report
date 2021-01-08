@@ -1,0 +1,56 @@
+agile adoption
+agile assessments
+agile certified scrum master (csm)
+agile coach
+agile engineering
+agile methods
+agile requirements
+
+analysis of alternatives (aoa)
+business analysis
+certified safe agilist
+certified safe spc
+certified scaled agilist
+
+concept of operations (conops)
+cots integration
+data analysis
+devops
+enterprise architecture
+human factors
+irs
+itil
+java
+kanban
+pmp
+process improvement
+program management
+project implementation
+project lifecycle methodology
+project management
+project management professional (pmp)
+python
+
+requirements
+requirements engineering
+requirements management
+
+risk management
+safe
+scaled agile framework (safe)
+scrum
+scrum master
+software engineering
+sql
+
+system design
+systems analysis
+systems architecture
+systems engineering
+systems integration
+
+use cases
+user research
+user stories
+
+visualization
