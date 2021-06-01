@@ -22,7 +22,7 @@ let nonCompliantCount = $("#ContentPlaceHolder1_lblNCCnt").text();
 let notReportingCount = $("#ContentPlaceHolder1_lblWaivedCnt").text();
 let totalMachines = $("#ContentPlaceHolder1_lblTotal").text();
 
-const styles = fs.readFileSync("styles.css", "utf8");
+const styles = fs.readFileSync("styles.inc", "utf8");
 
 const csource = styles + fs.readFileSync("ctemplate.html", "utf8");
 const ctemplate = handlebars.compile(csource);
