@@ -11,7 +11,7 @@ const fname = "Desktop Steward Compliance Report.html";
 const data = fs.readFileSync(fname, "utf8");
 
 const $ = cheerio.load(data);
-let mode = process.argv[2] || "";
+let mode = process.argv[2] || "nosend";
 
 const people = fs.readFileSync("contacts.csv", "utf8");
 let found = (user = machine = status = problem = ""),
