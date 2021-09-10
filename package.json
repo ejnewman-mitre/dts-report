@@ -19,6 +19,5 @@
     "request-promise": "^4.2.5",
     "safari-ctl": "^0.2.0"
   },
-  "devDependencies": {},
   "description": ""
 }
