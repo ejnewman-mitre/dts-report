@@ -6,7 +6,8 @@ const handlebars = require("handlebars");
 const parse = require("csv-parse");
 const nodemailer = require("nodemailer");
 
-const fname = "Desktop Steward Compliance Report.html";
+//const fname = "Desktop Steward Compliance Report.html";
+const fname = "orgReport.aspx.html";
 
 const data = fs.readFileSync(fname, "utf8");
 
