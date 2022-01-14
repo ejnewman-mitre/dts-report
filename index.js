@@ -232,7 +232,7 @@ function processBads(records) {
 }
 
 function sendEmail(html, uname, address, title) {
-  console.log("Sending " + title + "(" + uname + ") to " + address);
+  console.log("Sending " + title + " (" + uname + ") to " + address);
 
   if (mode != "real") {
     address = "ejnewman@mitre.org";
