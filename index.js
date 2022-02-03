@@ -28,10 +28,7 @@ const styles = fs.readFileSync("styles.inc", "utf8");
 const csource = styles + fs.readFileSync("ctemplate.html", "utf8");
 const ctemplate = handlebars.compile(csource);
 
-let bads = [],
-  glbads = [],
-  badz = [];
-console.log("-------------------------------------------------------------");
+let bads = [], glbads = [], badz = [];
 
 parse(
   people,
