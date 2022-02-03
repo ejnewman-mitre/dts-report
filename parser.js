@@ -76,10 +76,11 @@ function processTableau() {
             }
         })
         .on('end',function(){
-            //results[email].push(msg);
+
             for (let [key, value] of Object.entries(results)) {
-                //console.log(`${key}: ${value}`);
+
                 value = value.join(' ') + "</table></div><p/>This is just an FYI, so no need to contact me on this. ";
+                value += "If you've already updated, you may need to run the MITRE updater app on your device to have changes register.";
                 value += " As always any issues should go straight to the help desk.<p/>Thanks!<p/> Eric Newman</body></html>";
                 //console.log(key, value);
                 const title = "* Updates needed for your MITRE devices *";
@@ -88,9 +89,6 @@ function processTableau() {
                 sendEmail(value, key, email, title);
                 
             }
-            //console.log(results['jdcook@mitre.org'].join(' '));
-
-            console.log("--x----------------------------------------------------------");
         });  
     function sendEmail(html, uname, address, title) {
         console.log("Sending to " + address);
