@@ -22,11 +22,17 @@ const csv = require('csv-parser');
 const utf8 = require('to-utf-8')
 const nodemailer = require("nodemailer");
 
-let mode = process.argv[2] || "nosend";
+let mode = process.argv[2];
 
 let results = [];
 let msg = "";
 let email = "", machine = "", issue = "";
+let bads = [];
+let firsts = [];
+let lasts = [];
+let machines = [];
+let cnt = 0;
+
 
 function processTableau() {
     let records = [];
@@ -54,8 +60,6 @@ function processTableau() {
                 }
                 email = email.trim();
                 
-                //if(email !== 'jdcook@mitre.org') return;
-
                 if(results[email] === undefined) {
                     results[email] = [];
                     msg = "<html><body>Hi " + own + ",<br /><p>Please excuse this interruption. MITRE\'s Desktop Steward has noticed the following machine(s) that need attention. ";
@@ -69,6 +73,14 @@ function processTableau() {
                 }
                 msg = '<tr><td bgcolor="E5F4F9">' + machine + '</td><td bgcolor="#E5F4F9">' + issue + "</td></tr>";
                 results[email].push(msg);
+                let d = [];
+                d.push(owner[1] + " " + owner[0]);
+                d.push(machine);
+                d.push(issue);
+                if(bads[email] === undefined) {
+					bads[email] = [];
+                }
+                bads[email].push(d);
             }
             catch(err) {
                 //error handler
@@ -86,43 +98,84 @@ function processTableau() {
                 const title = "* Updates needed for your MITRE devices *";
                 let email = key;
                 //email = 'ejnewman@mitre.org'
-                sendEmail(value, key, email, title);
+                sendEmail(value, email, title);
                 
             }
-        });  
-    function sendEmail(html, uname, address, title) {
-        console.log("Sending to " + address);
-        
-        if (mode != "real") {
-            address = "ejnewman@mitre.org";
-        }
-        
-        if (mode !== "nosend") {
-            let transporter = nodemailer.createTransport({
-                port: 25,
-                host: "mail.mitre.org",
-                secure: false,
-                ignoreTLS: true,
-            });
-            let info = transporter.sendMail({
-                from: "ejnewman@mitre.org",
-                to: address, //'ejnewman@mitre.org', //address
-                subject: title,
-                html: html,
-                text: html.replace(/(<([^>]+)>)/gi, ""),
-                replyTo: "ejnewman@mitre.org",
-                onError: (e) => {
-                    console.log(e);
-                },
-                onSuccess: (i) => {
-                    console.log("Success: " + address);
-                },
-            });
-        
-        }
-     }
-          
+            dlprocess();
 
+        });  
+    
+function sendEmail(html, address, title) {
+	
+	if (mode == "nosend") {
+		address = "ejnewman@mitre.org";
+	}
+	
+	console.log("Sending to " + address, mode);
+	
+	if (mode !== "nosend") {
+		let transporter = nodemailer.createTransport({
+			port: 25,
+			host: "mail.mitre.org",
+			secure: false,
+			ignoreTLS: true,
+		});
+		let info = transporter.sendMail({
+			from: "ejnewman@mitre.org",
+			to: address, //'ejnewman@mitre.org', //address
+			subject: title,
+			html: html,
+			text: html.replace(/(<([^>]+)>)/gi, ""),
+			replyTo: "ejnewman@mitre.org",
+			onError: (e) => {
+				console.log(e);
+			},
+			onSuccess: (i) => {
+				console.log("Success: " + address);
+			},
+		});
+	
+	}
+ }
+	//
+
+	function dlprocess() {
+
+		let DL = "Jenny";
+		let DLmail = "jrekas@mitre.org";
+		let msg = "";
+		
+		if (mode !== undefined) {
+			DLmail = "ejnewman@mitre.org";
+		}
+
+		const title = "* Updates needed for our Department's MITRE devices *";
+
+	
+		let html = "<html><body>Hi " + DL + ",<br /><p>Please excuse this interruption. MITRE\'s Desktop Steward has noticed the following department machine(s) that need attention. ";
+			html += "These devices have been noted as needing some important update and/or security patches. <p/>";
+			html += '<div style="text-align:center; width:100%">';
+			html += '<table border=1 width="90%" >';
+			html += '<tr width="25%"><th bgcolor="#33D1FF">Person</th><th bgcolor="#33D1FF">Machine</th><th bgcolor="#33D1FF">Issue</th></tr>';
+		
+		Object.keys(bads).forEach(function (data) {
+			let d = bads[data];
+		
+			html += '<tr><td bgcolor="E5F4F9">' + d[0][0] + '</td><td bgcolor="#E5F4F9">' + d[0][1] + "</td>";
+			html += '<td bgcolor="#E5F4F9">' + d[0][2] + "</td></tr>";
+			
+			console.log (d[0][0]+ "|" + d[0][1]+ "|" + (d[0][2]).substr(0, 20));
+		});
+		html += "</table>";
+
+		//console.log(html);
+		sendEmail(html, DLmail, title);
+		sendEmail(html, "ejnewman@mitre.org", title);
+	
+	};
 }
+
 processTableau();
+
+
 //------------------------------------------

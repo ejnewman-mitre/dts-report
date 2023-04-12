@@ -1,2 +1,4 @@
 #/bin/zsh
-open "https://dts.mitre.org/orgReport.aspx?txtDept=L1A1&amp;showdetail=0"
+cd '/Users/ejnewman/OneDrive - The MITRE Corporation/Development/dts_scraper'
+sleep 1
+mv /Users/ejnewman/Downloads/Department_data.csv .

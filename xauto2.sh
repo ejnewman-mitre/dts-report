@@ -1,0 +1,4 @@
+#/bin/zsh
+open "https://mitretableau.mitre.org/views/Dept_Noncompliance/Department?:showAppBanner=false&:display_count=n&:showVizHome=n"
+#https://mitretableau.mitre.org/views/Dept_Noncompliance/Department?:embed=y&:showVizHome=n&:toolbar=top&%3Adisplay_count=n&%3AshowAppBanner=false&%3AshowVizHome=n&%3AopenAuthoringInTopWindow=true&%3AbrowserBackButtonUndo=true&%3AcommentingEnabled=true&%3AreloadOnCustomViewSave=true&%3AisVizPortal=true&:apiID=host0#navType=0&navSrc=Opt&3
+#https://mitretableau.mitre.org/vizql/w/Dept_Noncompliance/v/Department/vudcsv/sessions/3CFCA77143494E24A407DC8FBB845C54-1:0/views/7713620505763405234_17021576695544959450?showall=true&underlying_table_id=_7B0D1E4FBB1A403E9DAE7E904F937CA0&underlying_table_caption=Full%20Data
